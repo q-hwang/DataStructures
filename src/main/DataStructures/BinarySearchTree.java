@@ -26,6 +26,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         size = 0;
     }
 
+    /*
+
+    Interface implementations
+
+     */
+
     @Override
     public int size() {
         return size;
@@ -34,28 +40,6 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     @Override
     public boolean isEmpty() {
         return size == 0;
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        //noinspection unchecked
-        return find((T) o) != null;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return inOrderIterator();
-    }
-
-    @Override
-    public Object[] toArray() {
-        return toInOrderArray();
-    }
-
-    @Override
-    public <T1> T1[] toArray(T1[] a) {
-        //noinspection unchecked
-        return (T1[]) toInOrderArray();
     }
 
     public boolean add (T value) {
@@ -119,40 +103,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     }
 
     @Override
-    public boolean remove(Object o) {
-        return false;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends T> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    public boolean remove (T value) {
+    public boolean remove (Object value) {
         if (value == null) {
             throw new IllegalArgumentException("Do not accept null");
         }
-        BinaryNode<T> node = find(value);
+        //noinspection unchecked
+        BinaryNode<T> node = find((T) value);
         if (node == null) return false;
         size --;
         if (node.getLeft() == null || node.getRight() == null) {
@@ -169,6 +125,18 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return true;
     }
 
+    @Override
+    public boolean contains(Object o) {
+        //noinspection unchecked
+        return find((T) o) != null;
+    }
+
+    /**
+     * A helper method to find the element T
+     * @param value value
+     * @return the binaryNode containing value if the value exists.
+     *         {@code null} otherwise.
+     */
     private BinaryNode<T> find(T value) {
         BinaryNode<T> current = root;
         while (current != null && !current.getValue().equals(value)) {
@@ -178,16 +146,62 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return current;
     }
 
-    private Object[] toArray (Iterator<T> itr) {
-        Object[] result = new Object[size];
-        int n = 0;
-        while (itr.hasNext()) {
-            result[n] = itr.next();
-            n ++;
-        }
-        assert n == size;
-        return result;
+    /**
+     * @return inorder iterator
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return inOrderIterator();
     }
+
+    /**
+     * @return sorted array
+     */
+    @Override
+    public Object[] toArray() {
+        return toInOrderArray();
+    }
+
+    /**
+     * @return sorted array
+     */
+    @Override
+    public <T1> T1[] toArray(T1[] a) {
+        //noinspection unchecked
+        return (T1[]) toInOrderArray();
+    }
+
+    /*
+
+    Main tree operations
+
+    */
+
+    private void slice(BinaryNode<T> n) {
+        BinaryNode<T> newChild;
+        if (n.getLeft() == null) newChild = n.getRight();
+        else newChild = n.getLeft();
+        replace(n, newChild);
+    }
+
+    private void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
+        BinaryNode<T> parent = n.getParent();
+        if (n == root) {
+            root = newNode;
+            return;
+        }
+        if (n == parent.getLeft()) {
+            parent.setLeft(newNode);
+        } else {
+            parent.setRight(newNode);
+        }
+    }
+
+    /*
+
+    Tree traversal iterators and toArray
+
+     */
 
     public Object[] toInOrderArray () {
         return toArray(inOrderIterator());
@@ -199,6 +213,23 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
     public Object[] toPreOrderArray () {
         return toArray(preOrderIterator());
+    }
+
+
+    /**
+     * A helper method to print array in the order of provided by iterator
+     * @param itr iterator
+     * @return array of values
+     */
+    private Object[] toArray (Iterator<T> itr) {
+        Object[] result = new Object[size];
+        int n = 0;
+        while (itr.hasNext()) {
+            result[n] = itr.next();
+            n ++;
+        }
+        assert n == size;
+        return result;
     }
 
     public Iterator<T> preOrderIterator () {
@@ -279,25 +310,11 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         };
     }
 
-    private void slice(BinaryNode<T> n) {
-        BinaryNode<T> newChild;
-        if (n.getLeft() == null) newChild = n.getRight();
-        else newChild = n.getLeft();
-        replace(n, newChild);
-    }
+    /*
 
-    private void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
-        BinaryNode<T> parent = n.getParent();
-        if (n == root) {
-            root = newNode;
-            return;
-        }
-        if (n == parent.getLeft()) {
-            parent.setLeft(newNode);
-        } else {
-            parent.setRight(newNode);
-        }
-    }
+    Check Invariant
+
+     */
 
     private void checkInvariant(BinaryNode<T> t) {
         if (t == null) {
@@ -320,5 +337,36 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         Object[] preOrderArray = toPreOrderArray();
         Object[] postOrderArray =toPostOrderArray();
         checkInvariant(root);
+    }
+
+    /*
+
+    Unsupported Operations
+
+     */
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
     }
 }
