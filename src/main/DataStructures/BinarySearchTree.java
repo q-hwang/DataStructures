@@ -2,6 +2,7 @@ package main.DataStructures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -14,7 +15,7 @@ import java.util.Stack;
  * No Null value
  * @param <T>
  */
-public class BinarySearchTree<T extends Comparable<T>> {
+public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
 
     private BinaryNode<T> root;
@@ -23,6 +24,55 @@ public class BinarySearchTree<T extends Comparable<T>> {
     public BinarySearchTree () {
         root = null;
         size = 0;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        //noinspection unchecked
+        return find((T) o) != null;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return inOrderIterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return toInOrderArray();
+    }
+
+    @Override
+    public <T1> T1[] toArray(T1[] a) {
+        //noinspection unchecked
+        return (T1[]) toInOrderArray();
+    }
+
+    public boolean add (T value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Do not accept null");
+        }
+        BinaryNode<T> newNode = new BinaryNode<>(value);
+        size += 1;
+        if (root == null) {
+            root = newNode;
+            return true;
+        }
+        // recursive implementation
+        addTo(value, root);
+        // iterative implementation
+        // addTo(value);
+        return true;
     }
 
     /**
@@ -68,21 +118,34 @@ public class BinarySearchTree<T extends Comparable<T>> {
         }
     }
 
-    public boolean add (T value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Do not accept null");
-        }
-        BinaryNode<T> newNode = new BinaryNode<>(value);
-        size += 1;
-        if (root == null) {
-            root = newNode;
-            return true;
-        }
-        // recursive implementation
-        addTo(value, root);
-        // iterative implementation
-        // addTo(value);
-        return true;
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return false;
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     public boolean remove (T value) {

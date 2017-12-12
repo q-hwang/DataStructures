@@ -14,8 +14,7 @@ public class RandomString {
             for (int i = 0; i < size; i++) {
                 bytes[i] = (byte) (Math.random() * ((int)'Z' - (int)'A')+(int)'A');
             }
-            String value = new String(bytes, "ISO-8859-1");
-            return value;
+            return new String(bytes, "ISO-8859-1");
         } catch (UnsupportedEncodingException e) {
             System.err.println("encoding");
             return null;
