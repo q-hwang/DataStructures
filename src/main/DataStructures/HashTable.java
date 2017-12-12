@@ -145,6 +145,7 @@ public class HashTable<K, V> implements Map<K, V>{
    public void clear() {
       //noinspection unchecked
       table = (MyLinkedList<K,V>[]) new MyLinkedList<?, ?>[table.length];
+      size = 0;
    }
 
    @Override
