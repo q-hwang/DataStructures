@@ -18,9 +18,9 @@ import static org.junit.Assert.assertTrue;
 public class BinarySearchTreeTest {
     private BinarySearchTree<Integer> tree;
     private ArrayList<Integer> reference;
-    private final int MAX_ADD_SIZE = 100;
-    private final int MAX_DEL_SIZE = 10;
-    private final int MAX_VALUE = 1000;
+    private final static int MAX_ADD_SIZE = 100;
+    private final static int MAX_DEL_SIZE = 10;
+    private final static int MAX_VALUE = 1000;
 
 
     @Parameterized.Parameters
