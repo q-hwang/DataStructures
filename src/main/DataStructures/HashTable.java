@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;

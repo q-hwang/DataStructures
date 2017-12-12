@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 /**
  * Created by HQ on 9/19/2017.

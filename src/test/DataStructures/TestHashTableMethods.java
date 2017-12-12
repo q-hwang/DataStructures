@@ -1,10 +1,10 @@
-package main.DataStructures;
+package DataStructures;
 
 import org.junit.Test;
 
 import java.util.HashMap;
 
-import static main.common.RandomString.randomString;
+import static util.RandomString.randomString;
 import static org.junit.Assert.assertTrue;
 
 /**

@@ -1,8 +1,8 @@
-package main.DataStructures;
+package DataStructures;
 
 import org.junit.Test;
 
-import static main.common.RandomString.randomString;
+import static util.RandomString.randomString;
 
 
 public class TestHashTablePerformance {

@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 /**
  * BinaryNode class

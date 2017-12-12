@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 import java.util.concurrent.BlockingQueue;
 

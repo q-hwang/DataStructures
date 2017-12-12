@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 /**
  * The pair node

@@ -1,8 +1,7 @@
-package main.DataStructures;
+package DataStructures;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -10,7 +9,7 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.List;
 
-import static main.common.RandomString.randomString;
+import static util.RandomString.randomString;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

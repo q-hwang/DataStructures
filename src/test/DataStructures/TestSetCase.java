@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 import org.junit.*;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**

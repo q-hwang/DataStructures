@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 /**
  * My Linked List, contains key and value in each node

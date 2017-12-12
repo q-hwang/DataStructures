@@ -1,4 +1,4 @@
-package main.DataStructures;
+package DataStructures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +16,6 @@ import java.util.Stack;
  * @param <T>
  */
 public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
-
 
     private BinaryNode<T> root;
     private int size;

@@ -1,4 +1,4 @@
-package main.common;
+package util;
 
 import java.io.UnsupportedEncodingException;
 
