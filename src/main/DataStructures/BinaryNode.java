@@ -11,23 +11,22 @@ class BinaryNode<E> {
     private BinaryNode<E> left;
     private BinaryNode<E> right;
     private BinaryNode<E> parent = null;
+    private int size;
+    private int num = 1;
 
-    BinaryNode(E value, BinaryNode<E> left, BinaryNode<E> right) {
+    BinaryNode(E value, BinaryNode<E> left, BinaryNode<E> right, int num) {
         this.value = value;
         this.left = left;
-        if (left != null) {
-            left.parent = this;
-        }
         this.right = right;
-        if (right != null) {
-            right.parent = this;
-        }
+        this.num = num;
+        update();
     }
 
     BinaryNode (E value) {
         this.value = value;
         this.left = null;
         this.right = null;
+        this.size = 1;
     }
 
     /**
@@ -41,9 +40,7 @@ class BinaryNode<E> {
             left.parent = null;
         }
         left = node;
-        if (left != null) {
-            left.parent = this;
-        }
+        update();
     }
 
     /**
@@ -57,9 +54,33 @@ class BinaryNode<E> {
             right.parent = null;
         }
         right = node;
+        update();
+    }
+
+    void setParentNull() {
+        parent = null;
+    }
+
+    void increment() {
+        num ++;
+    }
+
+    void decrement() {
+        num --;
+    }
+
+    private void update() {
+        int l = 0;
+        int r = 0;
+        if (left != null) {
+            left.parent = this;
+            l = left.getSize();
+        }
         if (right != null) {
             right.parent = this;
+            r = right.getSize();
         }
+        size = Math.max(l, r) + 1;
     }
 
     BinaryNode<E> getLeft() {
@@ -74,7 +95,15 @@ class BinaryNode<E> {
         return parent;
     }
 
+    int getNum() {
+        return num;
+    }
+
     E getValue() {
         return value;
+    }
+
+    int getSize() {
+        return size;
     }
 }

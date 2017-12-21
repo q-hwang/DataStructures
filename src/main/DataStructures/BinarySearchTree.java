@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -17,12 +18,23 @@ import java.util.Stack;
  */
 public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
-    private BinaryNode<T> root;
+    protected BinaryNode<T> root;
     private int size;
+    protected final List<Invariant<BinaryNode<T>>> invariants = new ArrayList<>();
 
     public BinarySearchTree () {
         root = null;
         size = 0;
+        invariants.add(node -> {
+            BinaryNode<T> left = node.getLeft();
+            BinaryNode<T> right = node.getRight();
+            return (left == null ||
+                            left.getValue().compareTo(node.getValue()) < 0) &&
+                    (right == null ||
+                            node.getValue().compareTo(right.getValue()) < 0);
+        });
+        invariants.add(node -> node.getParent() != null || node == root);
+        invariants.add(node -> node.getNum() >= 1);
     }
 
     /*
@@ -42,54 +54,65 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     }
 
     public boolean add (T value) {
+        addValue(value);
+        return true;
+    }
+
+    protected BinaryNode<T> addValue (T value) {
         if (value == null) {
             throw new IllegalArgumentException("Do not accept null");
         }
-        BinaryNode<T> newNode = new BinaryNode<>(value);
         size += 1;
         if (root == null) {
-            root = newNode;
-            return true;
+            root = new BinaryNode<>(value);
+            return root;
         }
-        // recursive implementation
-        addTo(value, root);
-        // iterative implementation
-        // addTo(value);
-        return true;
+        return addTo(value, root);
     }
 
     /**
      * The recursive implementation of adding
      * @param value value to be added
      * @param t the current top node
+     * @return the added node.
      */
-    private void addTo(T value, BinaryNode<T> t) {
+    protected BinaryNode<T> addTo(T value, BinaryNode<T> t) {
         if (value.compareTo(t.getValue()) < 0) {
             if (t.getLeft() == null) {
-                t.setLeft(new BinaryNode<>(value));
-                return;
+                BinaryNode<T> newNode = new BinaryNode<>(value);
+                t.setLeft(newNode);
+                return newNode;
             }
-            addTo(value, t.getLeft());
-        } else {
+            return addTo(value, t.getLeft());
+        } else if (value.compareTo(t.getValue()) > 0) {
             if (t.getRight() == null) {
-                t.setRight(new BinaryNode<>(value));
-                return;
+                BinaryNode<T> newNode = new BinaryNode<>(value);
+                t.setRight(newNode);
+                return newNode;
             }
-            addTo(value, t.getRight());
+            return addTo(value, t.getRight());
+        } else {
+            t.increment();
+            return t;
         }
     }
 
     /**
      * The iterative implementation of adding
      * @param value value to be added
+     * @return the added node
      */
-    private void addTo(T value) {
+    protected BinaryNode<T> addTo(T value) {
         BinaryNode<T> newNode = new BinaryNode<>(value);
         BinaryNode<T> current = root;
         BinaryNode<T> parent = null;
         boolean left = true;
         while (current != null) {
             parent = current;
+            if (value.compareTo(current.getValue()) == 0) {
+                current.increment();
+                return current;
+            }
             left = (value.compareTo(current.getValue()) < 0);
             current = left ? current.getLeft() : current.getRight();
         }
@@ -99,6 +122,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         } else {
             parent.setRight(newNode);
         }
+        return newNode;
     }
 
     @Override
@@ -109,8 +133,15 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         //noinspection unchecked
         BinaryNode<T> node = find((T) value);
         if (node == null) return false;
+        removeNode(node);
+        return true;
+    }
+
+    protected void removeNode(BinaryNode<T> node) {
         size --;
-        if (node.getLeft() == null || node.getRight() == null) {
+        if (node.getNum() > 1) {
+            node.decrement();
+        } else if (node.getLeft() == null || node.getRight() == null) {
             slice(node);
         } else {
             BinaryNode<T> mid = node.getRight();
@@ -119,9 +150,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
             }
             slice(mid);
             replace(node, new BinaryNode<>(mid.getValue(), node.getLeft(),
-                    node.getRight()));
+                    node.getRight(), mid.getNum()));
         }
-        return true;
     }
 
     @Override
@@ -136,7 +166,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
      * @return the binaryNode containing value if the value exists.
      *         {@code null} otherwise.
      */
-    private BinaryNode<T> find(T value) {
+    protected BinaryNode<T> find(T value) {
         BinaryNode<T> current = root;
         while (current != null && !current.getValue().equals(value)) {
             current = value.compareTo(current.getValue()) < 0 ?
@@ -176,17 +206,18 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
     */
 
-    private void slice(BinaryNode<T> n) {
+    protected void slice(BinaryNode<T> n) {
         BinaryNode<T> newChild;
         if (n.getLeft() == null) newChild = n.getRight();
         else newChild = n.getLeft();
         replace(n, newChild);
     }
 
-    private void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
+    protected void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
         BinaryNode<T> parent = n.getParent();
         if (n == root) {
             root = newNode;
+            root.setParentNull();
             return;
         }
         if (n == parent.getLeft()) {
@@ -234,17 +265,23 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     public Iterator<T> preOrderIterator () {
         return new Iterator<T>() {
             Stack<BinaryNode<T>> stack = new Stack<>();
+            int num = 0;
+            T value;
             {
                 stack.push(root);
             }
 
             @Override
             public boolean hasNext() {
-                return root != null && !stack.isEmpty();
+                return (root != null && !stack.isEmpty()) || num != 0;
             }
 
             @Override
             public T next() {
+                if (num != 0) {
+                    num --;
+                    return value;
+                }
                 BinaryNode<T> next = stack.pop();
                 if (next.getRight() != null) {
                     stack.push(next.getRight());
@@ -252,7 +289,9 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
                 if (next.getLeft() != null){
                     stack.push(next.getLeft());
                 }
-                return next.getValue();
+                value = next.getValue();
+                num = next.getNum() - 1;
+                return value;
             }
         };
     }
@@ -260,12 +299,15 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     public Iterator<T> inOrderIterator () {
         return new Iterator<T>() {
             Queue<T> queue = queue(root);
-
             private Queue<T> queue(BinaryNode<T> t) {
                 Queue<T> q = new LinkedList<T>();
                 if (t != null && t.getValue() != null) {
                     q.addAll(queue(t.getLeft()));
-                    q.add(t.getValue());
+                    int num = t.getNum();
+                    T value = t.getValue();
+                    for (int i = 0; i < num; i ++) {
+                        q.add(value);
+                    }
                     q.addAll(queue(t.getRight()));
                 }
                 return q;
@@ -292,7 +334,11 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
                 if (t != null && t.getValue() != null) {
                     q.addAll(queue(t.getLeft()));
                     q.addAll(queue(t.getRight()));
-                    q.add(t.getValue());
+                    int num = t.getNum();
+                    T value = t.getValue();
+                    for (int i = 0; i < num; i ++) {
+                        q.add(value);
+                    }
                 }
                 return q;
             }
@@ -315,16 +361,15 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
      */
 
-    private void checkInvariant(BinaryNode<T> t) {
+    protected void checkInvariant(BinaryNode<T> t) {
         if (t == null) {
             return;
         }
+        invariants.forEach(invariant -> invariant.check(t));
         if (t.getLeft() != null) {
-            assert t.getLeft().getValue().compareTo(t.getValue()) < 0;
             checkInvariant(t.getLeft());
         }
         if (t.getRight() != null) {
-            assert t.getValue().compareTo(t.getRight().getValue()) <= 0;
             checkInvariant(t.getRight());
         }
     }
