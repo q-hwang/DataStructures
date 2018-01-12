@@ -1,9 +1,17 @@
 package DataStructures;
 
-import java.util.Arrays;
-
+/**
+ * AVL tree
+ * Invariants:
+ * Binary research tree invariants
+ * | left subtree height - right subtree height | <= 1 --> balanced
+ * @param <T>
+ */
 public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
+    /**
+     * Construct an empty AVL tree
+     */
     public AVLTree () {
         super();
         invariants.add(node -> {
@@ -14,12 +22,14 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
     }
 
+    @Override
     public boolean add (T value) {
         BinaryNode<T> newNode = addValue(value);
         reBalance(newNode.getParent());
         return true;
     }
 
+    @Override
     public boolean remove (Object value) {
         if (value == null) {
             throw new IllegalArgumentException("Do not accept null");
@@ -32,6 +42,10 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
         return true;
     }
 
+    /**
+     * A helper method to redolence the tree
+     * @param parent the lowest unbalanced node
+     */
     private void reBalance(BinaryNode<T> parent) {
         BinaryNode<T> l;
         BinaryNode<T> r;
@@ -63,12 +77,12 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
         checkInvariant(root);
     }
 
-    private int heightOfTree(BinaryNode<T> node) {
-        if (node == null) {
-            return 0;
-        }
-        return node.getSize();
-    }
+    /*
+
+    Rotation Operations
+
+     */
+
 
     private BinaryNode<T> rotateToLeft(BinaryNode<T> node) {
         BinaryNode<T> newTop = node.getRight();
@@ -90,5 +104,12 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
         node.setLeft(temp);
         newTop.setRight(node);
         return newTop;
+    }
+
+    private int heightOfTree(BinaryNode<T> node) {
+        if (node == null) {
+            return 0;
+        }
+        return node.getSize();
     }
 }

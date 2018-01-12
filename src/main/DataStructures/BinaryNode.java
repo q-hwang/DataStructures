@@ -11,22 +11,40 @@ class BinaryNode<E> {
     private BinaryNode<E> left;
     private BinaryNode<E> right;
     private BinaryNode<E> parent = null;
+    /**
+     * The height of this node
+     */
     private int size;
+    /**
+     * The number of same values in this node
+     * (duplicated values are stored in one node)
+     */
     private int num = 1;
 
+    /**
+     * Construct a node with no children and only containing one value
+     * @param value the value
+     */
+    BinaryNode (E value) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+        this.size = 1;
+    }
+
+    /**
+     * Construct a node with full information
+     * @param value the value
+     * @param left left child
+     * @param right right child
+     * @param num the number of same value stored
+     */
     BinaryNode(E value, BinaryNode<E> left, BinaryNode<E> right, int num) {
         this.value = value;
         this.left = left;
         this.right = right;
         this.num = num;
         update();
-    }
-
-    BinaryNode (E value) {
-        this.value = value;
-        this.left = null;
-        this.right = null;
-        this.size = 1;
     }
 
     /**
@@ -47,7 +65,7 @@ class BinaryNode<E> {
      * Set the right child to new node
      * The parent of new child will be this
      * The parent of old child will be null
-     * @param node
+     * @param node the new right node
      */
     void setRight(BinaryNode<E> node) {
         if (right != null) {
@@ -69,6 +87,22 @@ class BinaryNode<E> {
         num --;
     }
 
+    /**
+     * Update parent relationship ans heights of nodes
+     */
+    private void update() {
+        if (left != null) {
+            left.parent = this;
+        }
+        if (right != null) {
+            right.parent = this;
+        }
+        updateSize();
+    }
+
+    /**
+     * Update heights of nodes recursively to the root
+     */
     private void updateSize() {
         int l = 0;
         int r = 0;
@@ -82,16 +116,6 @@ class BinaryNode<E> {
         if (parent != null) {
             parent.updateSize();
         }
-    }
-
-    private void update() {
-        if (left != null) {
-            left.parent = this;
-        }
-        if (right != null) {
-            right.parent = this;
-        }
-        updateSize();
     }
 
     BinaryNode<E> getLeft() {

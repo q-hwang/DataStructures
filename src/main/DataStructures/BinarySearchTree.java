@@ -12,16 +12,20 @@ import java.util.Stack;
 /**
  * Basic Binary Search Tree
  * Invariant:
- * left < parent <= right
+ * left < parent < right
+ * The duplicate values are stored in the same node
  * No Null value
  * @param <T>
  */
 public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
-    protected BinaryNode<T> root;
+    BinaryNode<T> root;
     private int size;
-    protected final List<Invariant<BinaryNode<T>>> invariants = new ArrayList<>();
+    final List<Invariant<BinaryNode<T>>> invariants = new ArrayList<>();
 
+    /**
+     * Construct an empty tree
+     */
     public BinarySearchTree () {
         root = null;
         size = 0;
@@ -53,12 +57,18 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return size == 0;
     }
 
+    @Override
     public boolean add (T value) {
         addValue(value);
         return true;
     }
 
-    protected BinaryNode<T> addValue (T value) {
+    /**
+     * A helper method to check sanity and add the value to the tree
+     * @param value the value to add
+     * @return the added node
+     */
+    BinaryNode<T> addValue(T value) {
         if (value == null) {
             throw new IllegalArgumentException("Do not accept null");
         }
@@ -76,7 +86,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
      * @param t the current top node
      * @return the added node.
      */
-    protected BinaryNode<T> addTo(T value, BinaryNode<T> t) {
+    private BinaryNode<T> addTo(T value, BinaryNode<T> t) {
         if (value.compareTo(t.getValue()) < 0) {
             if (t.getLeft() == null) {
                 BinaryNode<T> newNode = new BinaryNode<>(value);
@@ -137,7 +147,14 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return true;
     }
 
-    protected BinaryNode<T> removeValue(BinaryNode<T> node) {
+    /**
+     * Remove the value from the tree. If the tree has more than one piece of
+     * this value, the size of the node will be decreased by one. Otherwise,
+     * the node will be removed
+     * @param node the node corresponding to the value
+     * @return the lowest affected parent
+     */
+    BinaryNode<T> removeValue(BinaryNode<T> node) {
         size --;
         BinaryNode<T> lowestAffectedParent;
         if (node.getNum() > 1) {
@@ -170,12 +187,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
     }
 
     /**
-     * A helper method to find the element T
-     * @param value value
+     * A helper method to find the node containing the value.
+     * @param value the value
      * @return the binaryNode containing value if the value exists.
      *         {@code null} otherwise.
      */
-    protected BinaryNode<T> find(T value) {
+    BinaryNode<T> find(T value) {
         BinaryNode<T> current = root;
         while (current != null && !current.getValue().equals(value)) {
             current = value.compareTo(current.getValue()) < 0 ?
@@ -215,7 +232,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
     */
 
-    protected void slice(BinaryNode<T> n) {
+    /**
+     * Slice the node out of the tree. The node sliced will have no children and
+     * parent
+     * @param n the node to slice
+     */
+    private void slice(BinaryNode<T> n) {
         BinaryNode<T> newChild;
         if (n.getLeft() == null) {
             newChild = n.getRight();
@@ -229,7 +251,13 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
     }
 
-    protected void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
+    /**
+     * Replace the node {@code n}  with {@code newNode}
+     * The old node will have no parent
+     * @param n the node to be replaced
+     * @param newNode the new node
+     */
+    void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
         BinaryNode<T> parent = n.getParent();
         if (n == root) {
             root = newNode;
@@ -252,15 +280,15 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
      */
 
-    public Object[] toInOrderArray () {
+    private Object[] toInOrderArray() {
         return toArray(inOrderIterator());
     }
 
-    public Object[] toPostOrderArray () {
+    private Object[] toPostOrderArray() {
         return toArray(postOrderIterator());
     }
 
-    public Object[] toPreOrderArray () {
+    private Object[] toPreOrderArray() {
         return toArray(preOrderIterator());
     }
 
@@ -281,7 +309,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return result;
     }
 
-    public Iterator<T> preOrderIterator () {
+    private Iterator<T> preOrderIterator() {
         return new Iterator<T>() {
             Stack<BinaryNode<T>> stack = new Stack<>();
             int num = 0;
@@ -315,11 +343,11 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         };
     }
 
-    public Iterator<T> inOrderIterator () {
+    private Iterator<T> inOrderIterator() {
         return new Iterator<T>() {
             Queue<T> queue = queue(root);
             private Queue<T> queue(BinaryNode<T> t) {
-                Queue<T> q = new LinkedList<T>();
+                Queue<T> q = new LinkedList<>();
                 if (t != null && t.getValue() != null) {
                     q.addAll(queue(t.getLeft()));
                     int num = t.getNum();
@@ -344,12 +372,12 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         };
     }
 
-    public Iterator<T> postOrderIterator () {
+    private Iterator<T> postOrderIterator() {
         return new Iterator<T>() {
             Queue<T> queue = queue(root);
 
             private Queue<T> queue(BinaryNode<T> t) {
-                Queue<T> q = new LinkedList<T>();
+                Queue<T> q = new LinkedList<>();
                 if (t != null && t.getValue() != null) {
                     q.addAll(queue(t.getLeft()));
                     q.addAll(queue(t.getRight()));
@@ -380,7 +408,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
      */
 
-    protected void checkInvariant(BinaryNode<T> t) {
+    void checkInvariant(BinaryNode<T> t) {
         if (t == null) {
             return;
         }
@@ -393,7 +421,10 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         }
     }
 
-
+    /**
+     * Check invariants and comparing with reference
+     * @param reference a list that contains the same elements as this tree
+     */
     void checkInvariant(ArrayList<T> reference) {
         reference.sort(Comparable::compareTo);
         assert Arrays.equals(reference.toArray(), toInOrderArray());
@@ -402,7 +433,8 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         checkInvariant(root);
     }
 
-    private StringBuilder buildTree(StringBuilder sb, BinaryNode<T> node, int depth){
+    private StringBuilder buildTree(StringBuilder sb, BinaryNode<T> node,
+                                    int depth){
         if (node == null) {
             return sb;
         }
@@ -417,6 +449,9 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         return buildTree(l, node.getRight(), depth + 1);
     }
 
+    /**
+     * Print the tree structure
+     */
     void printTree() {
         System.out.println(buildTree(new StringBuilder(), root, 0));
     }
