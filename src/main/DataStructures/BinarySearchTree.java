@@ -143,18 +143,15 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         if (node.getNum() > 1) {
             node.decrement();
             lowestAffectedParent = node.getParent();
-            System.out.println("decre");
         } else if (node.getLeft() == null || node.getRight() == null) {
             lowestAffectedParent = node.getParent();
             slice(node);
-            System.out.println("slice");
         } else {
             BinaryNode<T> mid = node.getRight();
             while (mid.getLeft() != null) {
                 mid = mid.getLeft();
             }
             lowestAffectedParent = mid.getParent();
-            System.out.println(lowestAffectedParent == node);
             if (lowestAffectedParent == node) {
                 lowestAffectedParent = mid;
             }

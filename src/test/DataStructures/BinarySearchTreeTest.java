@@ -46,12 +46,12 @@ public class BinarySearchTreeTest {
         }
         Checker[] checkers = new Checker[] {this::add, this::delete,
                                             this::contains};
-        // System.out.println(System.nanoTime());
-        int n = MID_TEST_NUM;
+        // long time = System.nanoTime();
+        int n = LARGE_TEST_NUM;
         while (n-- > 0) {
             checkers[(int)(Math.random()*3)].check();
         }
-        // System.out.println(System.nanoTime());
+        // System.out.println(System.nanoTime() - time);
     }
 
     @FunctionalInterface

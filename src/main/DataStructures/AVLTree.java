@@ -42,7 +42,7 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
             int rSize = heightOfTree(r);
             if (lSize - rSize >= 2) {
                 if (heightOfTree(l.getLeft()) -
-                        heightOfTree(l.getRight()) >= 1) {
+                        heightOfTree(l.getRight()) >= 0) {
                     parent = rotateToRight(parent);
                 } else {
                     rotateToLeft(l);
@@ -50,7 +50,7 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
                 }
             } else if (rSize - lSize >= 2) {
                 if (heightOfTree(r.getRight()) -
-                        heightOfTree(r.getLeft()) >= 1) {
+                        heightOfTree(r.getLeft()) >= 0) {
                     parent = rotateToLeft(parent);
                 } else {
                     rotateToRight(r);
