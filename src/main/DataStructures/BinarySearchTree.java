@@ -133,25 +133,37 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         //noinspection unchecked
         BinaryNode<T> node = find((T) value);
         if (node == null) return false;
-        removeNode(node);
+        removeValue(node);
         return true;
     }
 
-    protected void removeNode(BinaryNode<T> node) {
+    protected BinaryNode<T> removeValue(BinaryNode<T> node) {
         size --;
+        BinaryNode<T> lowestAffectedParent;
         if (node.getNum() > 1) {
             node.decrement();
+            lowestAffectedParent = node.getParent();
+            System.out.println("decre");
         } else if (node.getLeft() == null || node.getRight() == null) {
+            lowestAffectedParent = node.getParent();
             slice(node);
+            System.out.println("slice");
         } else {
             BinaryNode<T> mid = node.getRight();
             while (mid.getLeft() != null) {
                 mid = mid.getLeft();
             }
+            lowestAffectedParent = mid.getParent();
+            System.out.println(lowestAffectedParent == node);
+            if (lowestAffectedParent == node) {
+                lowestAffectedParent = mid;
+            }
             slice(mid);
-            replace(node, new BinaryNode<>(mid.getValue(), node.getLeft(),
-                    node.getRight(), mid.getNum()));
+            mid.setLeft(node.getLeft());
+            mid.setRight(node.getRight());
+            replace(node, mid);
         }
+        return lowestAffectedParent;
     }
 
     @Override
@@ -208,16 +220,25 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
 
     protected void slice(BinaryNode<T> n) {
         BinaryNode<T> newChild;
-        if (n.getLeft() == null) newChild = n.getRight();
-        else newChild = n.getLeft();
+        if (n.getLeft() == null) {
+            newChild = n.getRight();
+            n.setRight(null);
+        }
+        else {
+            newChild = n.getLeft();
+            n.setLeft(null);
+        }
         replace(n, newChild);
+
     }
 
     protected void replace(BinaryNode<T> n, BinaryNode<T> newNode) {
         BinaryNode<T> parent = n.getParent();
         if (n == root) {
             root = newNode;
-            root.setParentNull();
+            if (root != null) {
+                root.setParentNull();
+            }
             return;
         }
         if (n == parent.getLeft()) {
@@ -225,6 +246,7 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         } else {
             parent.setRight(newNode);
         }
+        n.setParentNull();
     }
 
     /*
@@ -383,6 +405,24 @@ public class BinarySearchTree<T extends Comparable<T>> implements Collection<T>{
         checkInvariant(root);
     }
 
+    private StringBuilder buildTree(StringBuilder sb, BinaryNode<T> node, int depth){
+        if (node == null) {
+            return sb;
+        }
+        for (int i = 0; i < depth; i++) {
+            sb.append("-");
+        }
+        sb.append(node.getValue().toString())
+                .append(" ")
+                .append(node.getNum())
+                .append("\n");
+        StringBuilder l = buildTree(sb, node.getLeft(), depth + 1);
+        return buildTree(l, node.getRight(), depth + 1);
+    }
+
+    void printTree() {
+        System.out.println(buildTree(new StringBuilder(), root, 0));
+    }
     /*
 
     Unsupported Operations

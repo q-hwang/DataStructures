@@ -69,18 +69,29 @@ class BinaryNode<E> {
         num --;
     }
 
-    private void update() {
+    private void updateSize() {
         int l = 0;
         int r = 0;
         if (left != null) {
-            left.parent = this;
             l = left.getSize();
         }
         if (right != null) {
-            right.parent = this;
             r = right.getSize();
         }
         size = Math.max(l, r) + 1;
+        if (parent != null) {
+            parent.updateSize();
+        }
+    }
+
+    private void update() {
+        if (left != null) {
+            left.parent = this;
+        }
+        if (right != null) {
+            right.parent = this;
+        }
+        updateSize();
     }
 
     BinaryNode<E> getLeft() {

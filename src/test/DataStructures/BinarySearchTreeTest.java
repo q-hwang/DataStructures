@@ -20,9 +20,9 @@ import static util.TestParameters.MIN_TEST_NUM;
 public class BinarySearchTreeTest {
     private BinarySearchTree<Integer> tree;
     private ArrayList<Integer> reference;
-    private final static int MAX_ADD_SIZE = 100;
+    private final static int MAX_ADD_SIZE = 10;
     private final static int MAX_DEL_SIZE = 10;
-    private final static int MAX_VALUE = 1000;
+    private final static int MAX_VALUE = 100;
 
     @Parameterized.Parameters
     public static List<Object[]> data() {
@@ -33,6 +33,7 @@ public class BinarySearchTreeTest {
     }
 
     public BinarySearchTreeTest(BinarySearchTree<Integer> tree) {
+
         this.tree = tree;
         reference = new ArrayList<>();
     }
@@ -46,7 +47,7 @@ public class BinarySearchTreeTest {
         Checker[] checkers = new Checker[] {this::add, this::delete,
                                             this::contains};
         // System.out.println(System.nanoTime());
-        int n = MIN_TEST_NUM;
+        int n = MID_TEST_NUM;
         while (n-- > 0) {
             checkers[(int)(Math.random()*3)].check();
         }
@@ -78,5 +79,4 @@ public class BinarySearchTreeTest {
         Integer value = (int) (Math.random() * MAX_VALUE);
         assertTrue(tree.contains(value) == reference.contains(value));
     }
-
 }

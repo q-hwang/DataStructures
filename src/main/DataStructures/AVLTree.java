@@ -6,34 +6,29 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
 
     public AVLTree () {
         super();
-        /*
         invariants.add(node -> {
             int lSize = heightOfTree(node.getLeft());
             int rSize = heightOfTree(node.getRight());
             return Math.abs(lSize - rSize) <= 1;
         });
-        */
+
     }
 
     public boolean add (T value) {
         BinaryNode<T> newNode = addValue(value);
-        BinaryNode<T> parent = newNode.getParent();
-        reBalance(parent);
-        //checkInvariant(root);
+        reBalance(newNode.getParent());
         return true;
     }
 
-    public boolean remove (T value) {
+    public boolean remove (Object value) {
         if (value == null) {
             throw new IllegalArgumentException("Do not accept null");
         }
         //noinspection unchecked
         BinaryNode<T> node = find((T) value);
         if (node == null) return false;
-
-        BinaryNode<T> parent = node.getParent();
-        removeNode(node);
-        reBalance(parent);
+        reBalance(removeValue(node));
+        checkInvariant(root);
         return true;
     }
 
@@ -62,8 +57,10 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
                     parent = rotateToLeft(parent);
                 }
             }
+            checkInvariant(parent);
             parent = parent.getParent();
         }
+        checkInvariant(root);
     }
 
     private int heightOfTree(BinaryNode<T> node) {
@@ -74,7 +71,6 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
     }
 
     private BinaryNode<T> rotateToLeft(BinaryNode<T> node) {
-        checkInvariant(node);
         BinaryNode<T> newTop = node.getRight();
         node.setRight(null);
         replace(node, newTop);
@@ -82,15 +78,10 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
         newTop.setLeft(null);
         node.setRight(temp);
         newTop.setLeft(node);
-        checkInvariant(temp);
-        checkInvariant(node);
-        checkInvariant(newTop);
-        checkInvariant(root);
         return newTop;
     }
 
     private BinaryNode<T> rotateToRight(BinaryNode<T> node) {
-        checkInvariant(node);
         BinaryNode<T> newTop = node.getLeft();
         node.setLeft(null);
         replace(node, newTop);
@@ -98,8 +89,6 @@ public class AVLTree<T extends Comparable<T>> extends BinarySearchTree<T> {
         newTop.setRight(null);
         node.setLeft(temp);
         newTop.setRight(node);
-        checkInvariant(newTop);
-        checkInvariant(root);
         return newTop;
     }
 }
